@@ -149,8 +149,10 @@ function queryIceConfig(name) {
 var asUrl = url.parse(argv.as_uri);
 var port = asUrl.port;
 port = process.env.PORT || 8443;
+
 var server = https.createServer(options, app).listen(port, "0.0.0.0", function() {
     console.log('STUNnerTutorial started: Kurento direct call');
+    console.log("Listeneing on port: " + port);
   console.log('Open ' + url.format(asUrl) + ' with a WebRTC capable browser');
 });
 
