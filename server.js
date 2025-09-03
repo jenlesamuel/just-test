@@ -150,21 +150,56 @@ var asUrl = url.parse(argv.as_uri);
 var port = asUrl.port;
 port = process.env.PORT || 10000;
 
-var server = https.createServer(options, app).listen(port, "0.0.0.0", function() {
-    console.log('STUNnerTutorial started: Kurento direct call');
-    console.log("Listeneing on port: " + port);
-  console.log('Open ' + url.format(asUrl) + ' with a WebRTC capable browser');
-});
+// var server = https.createServer(options, app).listen(port, "0.0.0.0", function() {
+//     console.log('STUNnerTutorial started: Kurento direct call');
+//     console.log("Listeneing on port: " + port);
+//   console.log('Open ' + url.format(asUrl) + ' with a WebRTC capable browser');
+// });
+
+// server.keepAliveTimeout = 120 * 1000;
+// server.headersTimeout = 120 * 1000;
+
+
+
+// var wss = new ws.Server({
+//   server : server,44
+//   path : '/one2one'
+// });
+
+let server;
+let wss;
+
+if (process.env.NODE_ENV === 'production') {
+    // Production (Render): Use HTTP server, Render handles HTTPS termination
+    server = http.createServer(app).listen(port, "0.0.0.0", function() {
+        console.log('STUNnerTutorial started: Kurento direct call (Production)');
+        console.log("HTTP Listening on port: " + PORT);
+        console.log('Render provides HTTPS termination');
+    });
+    
+    // WebSocket server using HTTP server (Render will upgrade to WSS)
+    wss = new ws.Server({
+        server: server,
+        path: '/one2one'
+    });
+    
+} else {
+    // Development: Use HTTPS server with your certificates
+    server = https.createServer(options, app).listen(8443, "0.0.0.0", function() {
+        console.log('STUNnerTutorial started: Kurento direct call (Development)');
+        console.log("Listening on port: " + HTTPS_PORT);
+        console.log('Open ' + url.format(asUrl) + ' with a WebRTC capable browser');
+    });
+    
+    // WebSocket server using HTTPS server
+    wss = new ws.Server({
+        server: server,
+        path: '/one2one'
+    });
+}
 
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
-
-
-
-var wss = new ws.Server({
-  server : server,
-  path : '/one2one'
-});
 
 wss.on('connection', function(ws) {
   var sessionId = nextUniqueId();
