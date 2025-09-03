@@ -148,7 +148,7 @@ function queryIceConfig(name) {
 
 var asUrl = url.parse(argv.as_uri);
 var port = asUrl.port;
-port = process.env.PORT || 8443;
+port = process.env.PORT || 10000;
 
 var server = https.createServer(options, app).listen(port, "0.0.0.0", function() {
     console.log('STUNnerTutorial started: Kurento direct call');
